@@ -1,50 +1,61 @@
 var express = require("express");
 var router = express.Router();
-const userService = require("../Service/userService");
-const userValidation = require("./userValidation");
+var userService = require("../service/userService");
+var userValidation = require("./userValidation")
 
-const userController = (req, res, next) => {
-  console.log("userController");
-  res.send("Its Harris");
-};
-const userData = (req, res, next) => {
-  const user = userService.getUser();
-  res.send(user);
-};
-const addUser = async (req, res, next) => {
-  console.log("i am here");
-  const { error, value } = userValidation.createUser.validate(req.body);
-  if (!error) {
-    const add = await userService.addUser(value);
-    res.send(add);
-  } else {
-    res.send(error.details[0].message);
-  }
-};
-const updatedUser = (req, res, next) => {
-  console.log(req.params);
-  const { error, value } = userValidation.updateUser.validate(req.body);
-  if (!error) {
-    const user = userService.updatedUserService(req.params.id, value);
-    res.send(user);
-  } else {
-    res.send(error.details[0].message);
-  }
-};
-const deleteuser = (req, res, next) => {
-  const user = userService.deleteUser(req.params.id);
-  res.send(user);
-};
-const studentData = (req, res, next) => {
-  const student = userService.getStudents();
-  res.send(student);
-};
+// Callback Functions
 
-module.exports = {
-  userController,
-  userData,
-  addUser,
-  updatedUser,
-  deleteuser,
-  studentData,
-};
+/* GET users listing. */
+async function usersController(req, res, next) {
+  res.send(await userService.getUser());
+}
+
+async function addUserController(req, res, next) {
+  try {
+    const {error, value} = userValidation.addUser.validate(req.body)
+  if(error){
+    return res.send(error.details[0].message);
+  } else{
+    const data = await userService.addUser(value);
+    console.log(data);
+    return res.send(data);
+  }
+  } catch (error) {
+    res.send(error);
+  }
+  
+}
+
+async function updatedUserController(req, res, next) {
+  try {
+    const {error, value} = userValidation.updatedUser.validate(req.body)
+  if(error){
+    return res.send(error.details[0].message);
+  } else{
+    const userId = req.params.id;
+    const updateUserData = req.body;
+    const updated = await userService.updatedUser(userId, updateUserData, value);
+    res.send(updated);
+    
+  }
+  } catch (error) {
+    res.send(error);
+  }  
+}
+
+async function deleteUserController(req, res, next) {
+  try {
+    const {error, value} = userValidation.deleteUser.validate(req.body)
+  if(error){
+    return res.send(error.details[0].message);
+  } else{
+    const userId = req.params.id;
+    const deleted = await userService.deleteUser(userId, value);
+    res.send(deleted);
+  }
+  } catch (error) {
+    res.send(error);
+  }
+}
+
+module.exports = { usersController, addUserController, updatedUserController, deleteUserController };
