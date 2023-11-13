@@ -44,7 +44,7 @@ async function updatedCourseController(req, res, next) {
 
 async function deleteCourseController(req, res, next) {
   try {
-    const {error, value} = courseValidation.deleteStudent.validate(req.body)
+    const {error, value} = courseValidation.deleteCourse.validate(req.body)
   if(error){
     return res.send(error.details[0].message);
   } else{

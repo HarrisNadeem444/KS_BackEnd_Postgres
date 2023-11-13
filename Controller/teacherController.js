@@ -57,4 +57,39 @@ async function deleteTeacherController(req, res, next) {
   }
 }
 
-module.exports = { teachersController, addTeacherController, updatedTeacherController, deleteTeacherController };
+async function registerTeacherController (req, res, next){
+  try{
+    const {error, value} = teacherValidation.registerTeacher.validate(req.body, {
+      abortEarly:false,
+    });
+    if (error) {
+      return res.send(error.details.map((err) => err.message));
+    } else {
+      const {teacherId, courseId} = value;
+      const newlyRegistered = await teacherService.registerTeacher(teacherId, courseId);
+      return res.send(newlyRegistered);
+    }
+  } catch (error) {
+    res.send(error);
+  }
+}
+
+async function coursesByTeacherController (req, res, next){
+  try {
+    const {error, value} = teacherValidation.coursesByTeacher.validate(
+      {id: req.params.id},
+      {
+        abortEarly: true,
+      }
+    );
+    if (error) {
+      return res.send(error.details.map((err) => err.message));
+    } else {
+      const teacherId = Number(value.id);
+      const data = await teacherService.coursesByTeacher(teacherId);
+      res.send(data);
+    }
+  } catch (error) {}
+}
+
+module.exports = { teachersController, addTeacherController, updatedTeacherController, deleteTeacherController, registerTeacherController, coursesByTeacherController };

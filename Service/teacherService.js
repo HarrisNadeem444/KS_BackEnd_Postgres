@@ -28,6 +28,40 @@ const {models} = require("../models")
     }
     return null;
     },
+
+    registerTeacher : async(teacherId, courseId) => {
+      try {
+        const newlyRegistered = await models.teacher_course.create({
+          teacherId,
+          courseId
+        })
+        return newlyRegistered;
+      } catch (error) {
+        console.log(error);
+      }
+    },
+    coursesByTeacher: async (teacherId) => {
+      try {
+        const coursesByTeacher = await models.teacher.findByPk(teacherId, {
+          include: [
+            {
+              model: models.user,
+            },
+            {
+              model: models.course,
+              through: models.teacher_course,
+            },
+          ],
+        });
+        if (coursesByTeacher) {
+          return coursesByTeacher;
+        } else {
+          return "No courses is being registered by this teacher";
+        }
+      } catch (error) {
+        console.log(error);
+      }
+    }
   };
   
    

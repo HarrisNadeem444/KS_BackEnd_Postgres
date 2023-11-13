@@ -28,6 +28,40 @@ const {models} = require("../models")
     }
     return null;
     },
+
+    enrollStudent : async(studentId, courseId) => {
+      try {
+        const newlyEnrolled = await models.student_course.create({
+          studentId,
+          courseId
+        })
+        return newlyEnrolled;
+      } catch (error) {
+        console.log(error);
+      }
+    },
+    coursesByStudent: async (studentId) => {
+      try {
+        const coursesByStudent = await models.student.findByPk(studentId, {
+          include: [
+            {
+              model: models.user,
+            },
+            {
+              model: models.course,
+              through: models.student_course,
+            },
+          ],
+        });
+        if (coursesByStudent) {
+          return coursesByStudent;
+        } else {
+          return "No courses is being enrolled by this student";
+        }
+      } catch (error) {
+        console.log(error);
+      }
+    }
   };
   
    
